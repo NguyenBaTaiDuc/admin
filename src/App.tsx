@@ -1,35 +1,63 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useContext } from "react";
+import { StateContext } from "./contexts/StateContext";
+import { Route, Routes } from "react-router-dom";
+import NotFoundPage from "./pages/NotFoundPage";
+import { Spin } from "antd";
+import HomePage from "./pages/HomePage";
+import AIContentPage from "./pages/AIContentPage";
+import SettingPage from "./pages/SettingPage";
+import TrafficGrowCenterPage from "./pages/TrafficGrowCenterPage";
+import PostSchedulePage from "./pages/PostSchedulePage";
+import MainLayout from "./components/Layout/MainLayout";
+
+const mainRoutes = [
+  {
+    path: "/",
+    element: <HomePage />,
+    key: "home",
+  },
+  {
+    path: "/ai_content_creation",
+    element: <AIContentPage />,
+    key: "ai_content_creation",
+  },
+  {
+    path: "/affiliate_management",
+    element: <TrafficGrowCenterPage />,
+    key: "affiliate_management",
+  },
+  {
+    path: "/setting",
+    element: <SettingPage />,
+    key: "setting",
+  },
+  {
+    path: "/post-schedule",
+    element: <PostSchedulePage />,
+    key: "post-schedule",
+  },
+];
 
 function App() {
-  const [count, setCount] = useState(0)
+  const { loading } = useContext(StateContext);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div style={{ position: "relative" }}>
+      <>
+        <Routes>
+          <Route key={"not-found"} path={"*"} element={<NotFoundPage />} />
+          {mainRoutes.map((item) => (
+            <Route key={item.key} path={item.path} element={item.element} />
+          ))}
+        </Routes>
+        {loading && (
+          <div>
+            <Spin />
+          </div>
+        )}
+      </>
+    </div>
+  );
 }
 
-export default App
+export default App;
