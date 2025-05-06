@@ -7,48 +7,34 @@ import HomePage from "./pages/HomePage";
 import AIContentPage from "./pages/AIContentPage";
 import SettingPage from "./pages/SettingPage";
 import TrafficGrowCenterPage from "./pages/TrafficGrowCenterPage";
+import Media_Management_page from "./pages/Media_Management_page";
 import PostSchedulePage from "./pages/PostSchedulePage";
-import MainLayout from "./components/Layout/MainLayout";
-
-const mainRoutes = [
-  {
-    path: "/",
-    element: <HomePage />,
-    key: "home",
-  },
-  {
-    path: "/ai_content_creation",
-    element: <AIContentPage />,
-    key: "ai_content_creation",
-  },
-  {
-    path: "/affiliate_management",
-    element: <TrafficGrowCenterPage />,
-    key: "affiliate_management",
-  },
-  {
-    path: "/setting",
-    element: <SettingPage />,
-    key: "setting",
-  },
-  {
-    path: "/post-schedule",
-    element: <PostSchedulePage />,
-    key: "post-schedule",
-  },
-];
-
+import"../src/i18n"
+import MainLayout from "./Layout/MainLayout";
+import Welcome_AI_Strategy from "./pages/Welcome_AI_Strategy";
+import GenerateMarketingPlan from "./pages/Generate_MarketingPlan_automatic";
+import ChatWithAI from "./pages/ChatWithAI";
+import UploadContentForAI from "./pages/UploadContentForAI";
 function App() {
   const { loading } = useContext(StateContext);
-
   return (
     <div style={{ position: "relative" }}>
       <>
         <Routes>
-          <Route key={"not-found"} path={"*"} element={<NotFoundPage />} />
-          {mainRoutes.map((item) => (
-            <Route key={item.key} path={item.path} element={item.element} />
-          ))}
+          <Route path='/' element={<MainLayout/>}>
+          <Route index element={<HomePage/>}/>
+          <Route path = '/' element={<HomePage/>}/>
+          <Route path="/ai_content_creation" element={<AIContentPage/>}/>
+          <Route path ='Media_Management' element={<Media_Management_page/>}/>
+          <Route path= 'post-schedule' element={<PostSchedulePage/>}/>
+          <Route path='TrafficGrowCenter' element={<TrafficGrowCenterPage/>}/>
+          <Route path='setting' element={<SettingPage/>}/>
+          <Route path="/Welcome_Strategy" element={<Welcome_AI_Strategy/>}/>
+          <Route path="/MarketingPlan_Automatic" element={<GenerateMarketingPlan/>}/>
+          <Route path="/ChatWithAI" element={<ChatWithAI/>}/>
+          <Route path="/UploadContentForAI" element={<UploadContentForAI/>}/>
+          <Route path="*" element={<NotFoundPage/>}/>
+          </Route>
         </Routes>
         {loading && (
           <div>
@@ -59,5 +45,4 @@ function App() {
     </div>
   );
 }
-
 export default App;

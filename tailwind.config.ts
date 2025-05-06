@@ -1,17 +1,25 @@
 /** @type {import('tailwindcss').Config} */
+module.exports = {
+  // ...
+  plugins: [
+    require('tailwind-scrollbar'),
+  ],
+};
+
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
       fontFamily: {
-        "montserrat-regular": ["Montserrat", "sans-serif"],
+        inter: ['Inter', 'sans-serif'],
+        montserrat: ['Montserrat', 'sans-serif'],
       },
       backgroundImage: {
         "custom-sidebar":
           "linear-gradient(to bottom left, #FDCE1C 2%, #FE881C 10%, #FE881C 80%, #FDCE1C 100%)",
       },
       colors: {
-        primary: "#FF760E",
+        primary: "#rgba(253, 206, 28, 0.733)",
         "primary-th1": "#FDCE1C",
         "primary-th2": "#C14600",
         "primary-black": "#262632",
@@ -70,5 +78,7 @@ export default {
       "bounce-slow": "bounce 2s infinite",
     },
   },
-  plugins: [],
+  plugins: [
+    require('tailwind-scrollbar')
+  ],
 };

@@ -1,1 +1,115 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Montserrat:wght@400;500;700&display=swap');
 @import "tailwindcss";
+/* src/styles/theme.css */
+@tailwind utilities;
+
+body {
+  font-family: 'Montserrat', sans-serif;
+}
+.bg-custom-sidebar {
+    background-image: linear-gradient(to bottom left, #FDCE1C 2%, #FE881C 10%, #FE881C 80%, #FDCE1C 100%);
+  }
+/* màu chủ đạo */
+:root {
+  --color-primary: #FF760E;
+  --color-settings: #3AA6CA;
+  --color-connect: #3AA6CAE6;
+  --color-bghoversidebar: #FDCE1CBB;
+  --color-primary-90: rgba(254, 195, 151, 0.6);
+
+}
+.hover-icon:hover {
+  color: var(--color-primary-90);
+}
+.color-primary {
+  color: var(--color-primary)
+}
+.bg-primary {
+  background-color: var(--color-primary) !important;
+}
+.border-primary {
+  border-color: var(--color-primary) !important;
+}
+.btn-settings{
+  color: var(--color-settings) !important;
+}
+.btn-connect{
+  color: var(--color-connect) !important;
+}
+.hover-bg-primary:hover {
+  background-color: var(--color-primary) !important;
+  color: white !important;
+}
+.hover-gbsidebar:hover {
+  background-color: var(--color-bghoversidebar) !important;
+  color: white !important;
+}
+/* màu của thanh scroll bar */
+/* Custom scrollbar styles */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #fff7ed; /* Màu nền track */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #f97316; /* Màu cam */
+  border-radius: 6px;
+  border: 2px solid #fff7ed;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #ea580c;
+}
+
+/* Custom Calender */
+/* === ANT CALENDAR CUSTOM STYLE === */
+
+/* Nút chuyển tháng */
+.ant-picker-calendar-header button {
+  color: #FF760E !important;
+  border-color: #FF760E !important;
+}
+
+.ant-picker-calendar-header button:hover {
+  background-color: #FF760E !important;
+  color: white !important;
+}
+
+/* Hover ngày */
+.ant-picker-cell-inner:hover {
+  background-color: #fff2e6 !important; /* cam nhạt */
+}
+
+/* Ngày đang chọn */
+.ant-picker-cell-selected .ant-picker-cell-inner {
+  background-color: #FF760E !important;
+  color: white !important;
+}
+
+/* Ngày đang focus (khi click) */
+.ant-picker-cell-in-view.ant-picker-cell-today .ant-picker-cell-inner {
+  border-color: #FF760E !important;
+}
+
+/* Header tháng/năm */
+.ant-picker-calendar-header {
+  color: #FF760E !important;
+  display: flex !important;
+  flex-direction: row-reverse !important;
+}
+  
+/* custom tooltip */
+.custom-tooltip .ant-tooltip-inner {
+  background-color: white;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  color: #333;
+  max-width: 260px;
+  font-size: 13px;
+}
+
+

@@ -1,4 +1,13 @@
 {
   "404.mess": "Sorry, the page you visited does not exist.",
-  "back": "Back"
+  "back": "Back",
+  "home" : "Home",
+  "Social Media" : "Social Media",
+  "Media Management": "Media Management",
+  "Post Schedule": "Post Schedule",
+  "Traffic Grow Center": "Traffic Grow Center",
+  "Settings": "Settings",
+  "Language": "Language",
+  "ai_content" : "Ai Content"
+
 }

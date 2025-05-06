@@ -1,0 +1,14 @@
+/* Tooltip.css */
+.ant-tooltip .ant-tooltip-inner {
+    background-color: white !important;
+    color: #333;
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    font-size: 13px;
+  }
+  /* 🎯 Màu mũi tên */
+.ant-tooltip .ant-tooltip-arrow::before {
+    background-color: white !important;
+  }
+  
