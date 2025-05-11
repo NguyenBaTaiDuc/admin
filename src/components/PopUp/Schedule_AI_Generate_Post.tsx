@@ -1,45 +1,60 @@
-import LeftOutlined from '@ant-design/icons/lib/icons/LeftOutlined'
-import RightOutlined from '@ant-design/icons/lib/icons/RightOutlined'
-import React  from 'react'
+import LeftOutlined from '@ant-design/icons/lib/icons/LeftOutlined';
+import RightOutlined from '@ant-design/icons/lib/icons/RightOutlined';
+import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 type PopUpProps = {
-  onClose: () => void; 
- }
+  onClose: () => void;
+};
 
-const Schedule_AI_Generate_Post: React.FC<PopUpProps> = ({onClose}) => {
+const Schedule_AI_Generate_Post: React.FC<PopUpProps> = ({ onClose }) => {
+  const { t } = useTranslation();
+  const modelRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (modelRef.current && !modelRef.current.contains(event.target as Node)) {
+        onClose();
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [onClose]);
+
   return (
-    <div className='bg-white p-6 rounded-lg w-full flex flex-col justify-center items-center'>
-          <h1 className="text-lg text-[rgb(255,118,14,var(--tw-text-opacity,1))] font-semibold  text-center">Select a post</h1>
-          <div className=' flex  items-center justify-center flex-row gap-2 mt-3'>
-            
-          <LeftOutlined 
-          style={{fontSize: '30px'}}
-          className=' opacity-50 cursor-not-allowed text-xl '/>
-            <p
-            className=' text-[15px]'
-            >There are no AI-generated posts yet.Go to the 
-                <span 
-                
-                onClick={() => navigate("/ai_content_creation")}
-                className='text-[rgb(58,166,202,var(--tw-text-opacity,1))] pl-1 cursor-pointer hover:underline'>AI Generate Post page to create.</span>
-            </p>
-            <RightOutlined 
-            style={{fontSize: '30px'}}
-            className='opacity-50 cursor-not-allowed text-xl' />
-          </div>
-          <div className='flex justify-end w-full'>
-        <button 
-        onClick={onClose}
-        className='px-4 py-2 mt-4 text-lg font-semibold border-2 border-[rgb(58,166,202,var(--tw-text-opacity,1))] text-[rgb(58,166,202,var(--tw-text-opacity,1))] rounded-md hover:bg-[rgb(58,166,202,var(--tw-text-opacity,1))]/80 hover:text-white'>
-          Close
-        </button>
+    <div
+      ref={modelRef}
+      className=" p-4 sm:p-6 rounded-lg w-fit max-w-[90%] sm:max-w-[480px] lg:max-w-[440px] mx-auto flex flex-col justify-center items-center">
+        
+      <h1 className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl text-[rgb(255,118,14)] font-semibold text-center">
+        {t("Select a post")}
+      </h1>
+
+      <div className="flex items-center justify-center flex-row gap-2 mt-4 text-sm sm:text-base">
+        <LeftOutlined
+          style={{ fontSize: '24px' }}
+          className="lg:!text-[32px] opacity-50 cursor-not-allowed"
+        />
+        <p className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-xl text-center leading-relaxed">
+          {t("There are no AI-generated posts yet.Go to the")}{' '}
+          <span
+            onClick={() => navigate('/ai_content_creation')}
+            className="text-[rgb(58,166,202)] cursor-pointer hover:underline text-sm sm:text-base md:text-lg lg:text-xl xl:text-xl"
+          >
+            {t("AI Generate Post page to create.")}
+          </span>
+        </p>
+        <RightOutlined
+          style={{ fontSize: '24px' }}
+          className="lg:!text-[32px] opacity-50 cursor-not-allowed"
+        />
       </div>
+
      
     </div>
-  
-  )
-}
+  );
+};
 
-export default Schedule_AI_Generate_Post
+export default Schedule_AI_Generate_Post;

@@ -1,228 +1,215 @@
-import CalendarOutlined from '@ant-design/icons/lib/icons/CalendarOutlined';
+import { schedulePostFacebook } from '@/services/apiFacebook';
 import DownOutlined from '@ant-design/icons/lib/icons/DownOutlined';
-import { log } from 'console';
-import React, { useEffect, useState } from 'react';
-
+import React, { useEffect, useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import dayjs from 'dayjs';
+import { toast } from 'react-toastify';
 interface ScheduleFacebookPostProps {
-    onClose: () => void;
-    platform: 'Facebook' | 'Instagram';
-    onBackToPlatForm: () => void;
+  onClose: () => void;
+  platform: 'Facebook' | 'Instagram';
+  onBackToPlatForm: () => void;
+  handlePostUpdated: () => Promise<void>;
 }
 
-const ScheduleFacebookPost: React.FC<ScheduleFacebookPostProps> = ({ onClose, platform, onBackToPlatForm }) => {
-    const [step, setStep] = useState(1);
-    const [content, setContent] = useState('');
-    const [imageUrl, setImageUrl] = useState('');
-    const [selectedPage, setSelectedPage] = useState('');
-    const [postingTime, setPostingTime] = useState('');
-    const [connectedPages, setConnectedPages] = useState<{ id: string; name: string; access_token: string }[]>([]);
-
-    useEffect(() => {
-        const pagesData = localStorage.getItem('connectedPages');
-        if (pagesData) {
-            const parsedPages = JSON.parse(pagesData);
-            if (Array.isArray(parsedPages)) {
-                const validPages = parsedPages.filter((page: any) => page.access_token);
-                setConnectedPages(validPages);
-            }
-        }
-    }, []);
-    const handleSchedulepost = () => {
-        const scheduledPosts = JSON.parse(localStorage.getItem('scheduledPosts') || '[]');
-        const postedPosts = JSON.parse(localStorage.getItem('postedPosts') || '[]');
-        const newPost = {
-            content,
-            imageUrl,
-            selectedPage,
-            postingTime,
-        };
-        localStorage.setItem('scheduledPosts', JSON.stringify([...scheduledPosts, newPost]));
-        window.dispatchEvent(new Event('reload_posts'))
-        schedulePost(newPost); // Đặt hẹn cho bài mới
+const ScheduleFacebookPost: React.FC<ScheduleFacebookPostProps> = ({ handlePostUpdated, onClose, platform, onBackToPlatForm }) => {
+  const modalRef = useRef<HTMLDivElement | null>(null)
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
         onClose();
+      }
     };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [onClose]);
+  const { t } = useTranslation();
+  const [step, setStep] = useState(1);
+  const [content, setContent] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
+  const [selectedPage, setSelectedPage] = useState('');
+  const [postingTime, setPostingTime] = useState('');
+  const [connectedPages, setConnectedPages] = useState<{ id: string; name: string; access_token: string }[]>([]);
+
+  useEffect(() => {
+    const pagesData = localStorage.getItem('connectedPages');
+    if (pagesData) {
+      const parsedPages = JSON.parse(pagesData);
+      if (Array.isArray(parsedPages)) {
+        const validPages = parsedPages.filter((page) => page.access_token);
+        setConnectedPages(validPages);
+      }
+    }
+  }, []);
+  const handleSchedulepost = async () => {
+    const scheduledTime = new Date(postingTime).getTime();
+    const now = Date.now();
+    if (isNaN(scheduledTime)) {
+      alert('Thời gian đăng bài không hợp lệ');
+      return;
+    }
+    if (scheduledTime <= now) {
+      alert('Bạn phải chọn thời gian đăng bài từ thời điểm hiện tại trở đi (không thể đặt lịch trong quá khứ).');
+      return;
+    }
+    const selected = connectedPages.find((page) => page.id == selectedPage);
+    if (!selected) {
+      alert('Không tìm thấy trang web');
+      return;
+    }
+    try {
+      const result = await schedulePostFacebook({
+        pageId: selected.id,
+        pageToken: selected.access_token,
+        message: content,
+        imageUrl: imageUrl ? [imageUrl] : null,
+        scheduledTime: Math.floor(scheduledTime / 1000),
+
+      });
+      // console.log(result?.id);
+      console.log({
+        pageId: selected.id,
+        pageToken: selected.access_token,
+        message: content,
+        imageUrl,
+        scheduledTime: Math.floor(scheduledTime / 1000),
+        postId: result?.id,
+      });
+      toast.success("Đặt lịch thành công");
+      if (typeof handleSchedulepost === 'function') {
+        await handlePostUpdated();
+      }
+      // window.dispatchEvent(new Event('reload_post'));
+      onClose();
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error("Lỗi khi đặt lịch bài viết", error.message);
+        toast.error("Đã xảy ra lỗi khi đặt lịch");
+        console.log('Lỗi khi đặt lịch:', error.message);
+      } else {
+        console.error("Lỗi không xác định:", error);
+        toast.error("Lỗi không xác định khi đặt lịch");
+      }
+    }
+  };
+  const handleNext = () => {
+    if (step === 1) setStep(2);
+  };
 
 
-    const handleNext = () => {
-        if (step === 1) setStep(2);
-    };
+  const handlePrevious = () => {
+    if (step === 2) {
+      setStep(1);
+    } else {
+      onBackToPlatForm(); // quay về CreateAndSchedulePost
+    }
+  };
+  return (
+    <div className="px-4 sm:px-6 md:px-10 py-6 w-full">
+      <div
+        ref={modalRef}
+      >
+        <h2 className="text-base sm:text-lg md:text-xl font-semibold text-[rgb(255,118,14,var(--tw-text-opacity,1))] mb-4 sm:mb-6 text-center">
+          {t('SchedulePost', { platform })}
+        </h2>
 
-    const handlePrevious = () => {
-        if (step === 2) {
-            setStep(1);
-        } else {
-            onBackToPlatForm(); // quay về CreateAndSchedulePost
-        }
-    };
-
-    const schedulePost = (post: any) => {
-        const postTime = new Date(post.postingTime).getTime();
-        const now = Date.now();
-        const delay = postTime - now;
-
-        if (delay <= 0) {
-            console.warn('Scheduled time is in the past, skipping post:', post);
-            return;
-        }
-
-        console.log(`Scheduling post in ${delay / 1000} seconds`, post);
-        alert('Đặt lịch dăng thành công');
-
-        setTimeout(async () => {
-            try {
-                await postToFacebook(post);
-                const currentPosts = JSON.parse(localStorage.getItem('scheduledPosts') || '[]');
-                currentPosts.push(post);
-                localStorage.setItem('postedPosts', JSON.stringify(currentPosts));
-                // const updatedPosts = currentPosts.filter((p: any) => p.postingTime !== post.postingTime);
-                // localStorage.setItem('scheduledPosts', JSON.stringify(updatedPosts));
-                // console.log('Post done and removed from schedule:', post);
-            } catch (error) {
-                console.error('Failed to post scheduled post:', error);
-            }
-        }, delay);
-    };
-    const postToFacebook = async (post: { content: string; imageUrl: string; selectedPage: string; postingTime: string }) => {
-        try {
-            const connectedPages = JSON.parse(localStorage.getItem('connectedPages') || '[]');
-            const selected = connectedPages.find((page: any) => page.id === post.selectedPage);
-
-            if (!selected) {
-                console.error('Page not found with id:', post.selectedPage);
-                throw new Error('Page not found!');
-            }
-
-            const pageId = selected.id;
-            const pageAccessToken = selected.access_token;
-
-            console.log(' Posting to Facebook with data:', {
-                pageId,
-                imageUrl: post.imageUrl,
-                caption: post.content,
-            });
-
-            const response = await fetch(`https://graph.facebook.com/${pageId}/photos`, {
-                method: 'POST',
-                body: new URLSearchParams({
-                    url: post.imageUrl,
-                    caption: post.content,
-                    access_token: pageAccessToken,
-                    published: 'true',
-                }),
-            });
-
-            const result = await response.json();
-
-            console.log(' Facebook API response:', result);
-
-            if (!response.ok) {
-                console.error('Facebook API Error:', result.error?.message || 'Unknown Error');
-                throw new Error(result.error?.message || 'Failed to post to Facebook');
-            }
-
-            console.log('Post successful:', result);
-            alert('bài bạn đặt lịch đã được đăng lên facebook ')
-            const postedPosts = JSON.parse(localStorage.getItem('postedPosts') || '[]');
-            postedPosts.push(post);
-            localStorage.setItem('postedPosts', JSON.stringify(postedPosts));
-        } catch (error: any) {
-            console.error('Error occurred during posting:', error.message || error);
-            throw error; // để cho ngoài hàm catch được lỗi tiếp
-        }
-    };
-    return (
-        <div className="">
-            <div className="popup">
-                <h2 className='text-lg font-semibold text-[rgb(255,118,14,var(--tw-text-opacity,1))] mb-6'>
-                    Schedule {platform === 'Facebook' ? 'Facebook' : 'Instagram'} Post
-                </h2>
-                {step === 1 && (
-                    <div>
-                        <label className='block text-sm font-semibold mb-2'>Content:</label>
-                        <div className="form-group ">
-                            <textarea
-                                className='w-full h-40 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[rgb(255,118,14,var(--tw-text-opacity,1))]'
-                                placeholder="Input content..."
-                                value={content}
-                                onChange={(e) => setContent(e.target.value)}
-                            />
-                        </div>
-                        <label className='block text-sm font-semibold text-black mb-2 mt-5'>Paste image URL:</label>
-                        <div className="form-group">
-                            <input
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[rgb(255,118,14,var(--tw-text-opacity,1))]"
-                                type="text"
-                                placeholder="Paste image URL..."
-                                value={imageUrl}
-                                onChange={(e) => setImageUrl(e.target.value)}
-                            />
-                        </div>
-                    </div>
-                )}
-                {step === 2 && (
-                    <div className='flex flex-col space-y-6 flex-grow'>
-                        <label className='block text-sm font-semibold text-black'>Select Facebook page:</label>
-                        <div className="relative w-full max-w-[300px]">
-                            <select
-                                value={selectedPage}
-                                onChange={(e) => setSelectedPage(e.target.value)}
-                                className="custom-select appearance-none w-full text-left px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-[rgb(255,118,14,var(--tw-text-opacity,1))]"
-                            >
-                                <option value="">Select a page</option>
-                                {
-                                    connectedPages.map((page) => (
-                                        <option key={page.id} value={page.id}>
-                                            {page.name}
-                                        </option>
-                                    ))
-                                }
-                            </select>
-                            {/* Mũi tên custom */}
-                            <DownOutlined
-                                style={{ fontSize: 15 }}
-                                className='pointer-events-none absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600' />
-                        </div>
-
-                        <label className="block text-sm font-semibold text-black mb-2">Posting time:</label>
-                        <div className="relative w-full">
-                            <input
-                                type="datetime-local"
-                                value={postingTime}
-                                onChange={(e) => setPostingTime(e.target.value)}
-                                className="w-full block pr-12 pl-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[rgb(255,118,14,var(--tw-text-opacity,1))] appearance-none"
-                            />
-                        </div>
-
-
-                    </div>
-                )}
-                <div className="flex justify-between mt-6">
-                    <button className="px-4 py-2 cursor-pointer w-max text-lg font-semibold border-2 border-[rgb(58,166,202,var(--tw-border-opacity,1))] text-[rgb(58,166,202,var(--tw-text-opacity,1))] rounded-md hover:bg-[rgb(58,166,202,var(--tw-border-opacity,1))]/80 hover:text-white" onClick={handlePrevious}>
-                        Previous
-                    </button>
-                    {step === 2 ? (
-                        <button
-                            className={`px-4 py-2 cursor-pointer w-max text-lg font-semibold border-2 rounded-md 
-                           ${selectedPage
-                                    ? 'bg-[rgb(3,105,94,var(--tw-border-opacity,1))] text-white hover:bg-[rgb(3,105,94,var(--tw-border-opacity,1))]/90 border-[rgb(3,105,94,var(--tw-border-opacity,1))]'
-                                    : 'bg-gray-300 text-gray-600 cursor-not-allowed border-gray-300'
-                                }`}
-                            onClick={handleSchedulepost}
-                            disabled={!selectedPage}
-                        >
-                            Schedule
-                        </button>
-                    ) : (
-                        <button
-                            className="px-4 py-2 cursor-pointer w-max text-lg font-semibold border-2 bg-[rgb(3,105,94,var(--tw-bg-opacity,1))] text-white rounded-md hover:bg-[rgb(3,105,94,var(--tw-bg-opacity,1))]/90 border-[rgb(3,105,94,var(--tw-border-opacity,1))] "
-                            onClick={handleNext}>
-                            Next
-                        </button>
-                    )}
-                </div>
+        {step === 1 && (
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm sm:text-base font-semibold mb-2">
+                {t('Content')}:
+              </label>
+              <textarea
+                className="w-full h-40 p-3 sm:p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[rgb(255,118,14,var(--tw-text-opacity,1))]"
+                placeholder={t('Input content...')}
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+              />
             </div>
+            <div>
+              <label className="block text-sm sm:text-base font-semibold text-black mb-2">
+                {t('Paste image URL')}:
+              </label>
+              <input
+                className="w-full p-3 sm:p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[rgb(255,118,14,var(--tw-text-opacity,1))]"
+                type="text"
+                placeholder={t('Paste image URL')}
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+              />
+            </div>
+          </div>
+        )}
+
+        {step === 2 && (
+          <div className="flex flex-col space-y-6 flex-grow mt-6">
+            <label className="block text-sm sm:text-base font-semibold text-black">
+              {t('Select Facebook page')}:
+            </label>
+            <div className="relative w-full max-w-xs sm:max-w-sm">
+              <select
+                value={selectedPage}
+                onChange={(e) => setSelectedPage(e.target.value)}
+                className="appearance-none w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-[rgb(255,118,14,var(--tw-border-opacity,1))]"
+              >
+                <option value="">{t('Select a Page')}</option>
+                {connectedPages.map((page) => (
+                  <option key={page.id} value={page.id}>
+                    {page.name}
+                  </option>
+                ))}
+              </select>
+              <DownOutlined
+                style={{ fontSize: 16 }}
+                className="pointer-events-none absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600"
+              />
+            </div>
+
+            <label className="block text-sm sm:text-base font-semibold text-black mb-2">
+              {t('Posting time')}:
+            </label>
+            <input
+              type="datetime-local"
+              value={postingTime}
+              min={dayjs().format('YYYY-MM-DDTHH:mm')}
+              onChange={(e) => setPostingTime(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[rgb(255,118,14,var(--tw-text-opacity,1))] appearance-none"
+            />
+          </div>
+        )}
+
+        <div className="flex justify-between mt-6">
+          <button
+            className="px-4 py-2 text-sm sm:text-base md:text-lg font-semibold border-2 border-[rgb(58,166,202,var(--tw-border-opacity,1))] text-[rgb(58,166,202,var(--tw-text-opacity,1))] rounded-md hover:bg-[rgb(58,166,202,var(--tw-border-opacity,1))]/80 hover:text-white"
+            onClick={handlePrevious}
+          >
+            {t('Previous')}
+          </button>
+
+          {step === 2 ? (
+            <button
+              className={`px-4 py-2 text-sm sm:text-base md:text-lg font-semibold border-2 rounded-md ${selectedPage
+                ? 'bg-[rgb(3,105,94,var(--tw-border-opacity,1))] text-white hover:bg-[rgb(3,105,94,var(--tw-border-opacity,1))]/90 border-[rgb(3,105,94,var(--tw-border-opacity,1))]'
+                : 'bg-gray-300 text-gray-600 cursor-not-allowed border-gray-300'
+                }`}
+              onClick={handleSchedulepost}
+              disabled={!selectedPage}
+            >
+              {t('Schedule')}
+            </button>
+          ) : (
+            <button
+              className="px-4 py-2 text-sm sm:text-base md:text-lg font-semibold border-2 bg-[rgb(3,105,94,var(--tw-bg-opacity,1))] text-white rounded-md hover:bg-[rgb(3,105,94,var(--tw-bg-opacity,1))]/90 border-[rgb(3,105,94,var(--tw-border-opacity,1))]"
+              onClick={handleNext}
+            >
+              {t('Next')}
+            </button>
+          )}
         </div>
-    );
+      </div>
+    </div>
+  );
+
 };
 
 export default ScheduleFacebookPost;
+

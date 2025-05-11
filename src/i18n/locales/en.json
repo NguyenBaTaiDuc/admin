@@ -8,6 +8,7 @@
   "Traffic Grow Center": "Traffic Grow Center",
   "Settings": "Settings",
   "Language": "Language",
-  "ai_content" : "Ai Content"
-
+  "ai_content" : "Ai Content",
+  "SchedulePost": "Schedule {{platform}} Post"
+ 
 }

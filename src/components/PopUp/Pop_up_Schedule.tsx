@@ -9,6 +9,7 @@ import update2 from '../PopUp/images/Update_Step_2.png';
 import update3 from '../PopUp/images/Update_Step_3.png';
 import delete2 from '../PopUp/images/Delete_step_2.png'
 import CloseOutlined from '@ant-design/icons/lib/icons/CloseOutlined';
+import { useTranslation } from 'react-i18next';
 const tabSteps = {
     Schedule: [
         {
@@ -80,9 +81,9 @@ type PopUpProps = {
 };
 type TabName = keyof typeof tabSteps;
 const Pop_up_Schedule: React.FC<PopUpProps> = ({ onClose }) => {
-
+    const { t } = useTranslation();
     //đóng mở pop up
-    const [IsOpenPopup, setIsOpenPopup] = useState(true);
+    const [IsOpenPopup] = useState(true);
     const modalRef = useRef<HTMLDivElement | null>(null)
 
     // áp dụng nhấn bên ngoài tắt pop up
@@ -96,7 +97,7 @@ const Pop_up_Schedule: React.FC<PopUpProps> = ({ onClose }) => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [onClose]);
 
-    if (!IsOpenPopup) return null;
+  
 
     //settting pop up
     const tabName = Object.keys(tabSteps) as TabName[];
@@ -105,6 +106,7 @@ const Pop_up_Schedule: React.FC<PopUpProps> = ({ onClose }) => {
 
     const steps = tabSteps[currentTab];
     const currentStep = steps[StepIndex];
+      if (!IsOpenPopup) return null;
 
     const goNext = () => {
         if (StepIndex < steps.length - 1) setStepIndex((s) => s + 1);
@@ -124,9 +126,7 @@ const Pop_up_Schedule: React.FC<PopUpProps> = ({ onClose }) => {
         <div className="fixed inset-0 z-[100] flex items-center justify-center w-full h-full bg-black/30 ">
             <div
                 ref={modalRef}
-                className="relative w-full h-auto md:w-[1149px] md:h-[658px] overflow-hidden p-2 bg-white rounded-lg "
-            >
-
+                className="relative w-[90vw] h-auto sm:w-[360px] md:w-[640px] lg:w-[900px] lg:h-[600px] xl:w-[1149px] xl:h-[658px] bg-white overflow-hidden rounded-lg p-4 flex flex-col justify-between">
                 {/* Close Button - đặt trên cùng bên phải */}
                 <button
                     onClick={onClose}
@@ -134,43 +134,53 @@ const Pop_up_Schedule: React.FC<PopUpProps> = ({ onClose }) => {
                 >
                     <CloseOutlined />
                 </button>
-
                 {/* Tab Bar - dưới nút X */}
-                <div className="flex justify-center gap-12  pt-10 ">
+                <div className=" flex justify-center gap-4 sm:gap-6 md:gap-8 lg:gap-10 xl:gap-12 pt-6 sm:pt-8 md:pt-10 w-full  max-w-[320px] sm:max-w-[480px] md:max-w-[640px] lg:max-w-[800px] xl:max-w-[1000px] mx-auto">
                     {tabName.map((tab) => (
                         <button
                             key={tab}
                             onClick={() => switchtab(tab)}
                             className={`font-medium ${tab === currentTab
-                                ? "text-[rgb(58,166,202,var(--tw-text-opacity,1))] py-2 px-4 text-xl  border-b-2 border-[rgb(58,166,202,var(--tw-text-opacity,1))]"
-                                : "text-gray-500 text-xl font-medium"
+                                ? "text-[rgb(58,166,202,var(--tw-text-opacity,1))] py-1 sm:py-2 px-2 sm:px-4  text-sm sm:text-base md:text-lg lg:text-xl  border-b-2 border-[rgb(58,166,202,var(--tw-text-opacity,1))]"
+                                : "text-gray-500 text-base sm:text-base md:text-lg lg:text-xl"
                                 }`}
                         >
-                            {tab}
+                            {t(tab)}
                         </button>
                     ))}
                 </div>
                 <hr className='w-[90%] ml-15 text-gray-300 mb-4 ' />
                 {/* Content */}
-
-                <div className="w-full">
-                    <h2 className="text-2xl w-full pl-35 font-semibold text-orange-600 mb-2">
-                        {currentStep.title}
+                <div className="flex-grow w-full px-4 sm:px-6 md:px-10 xl:px-12 flex flex-col justify-start">
+                    <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-semibold text-orange-600 mb-2 text-center sm:text-left">
+                        {t(currentStep.title)}
                     </h2>
-                    <p className="text-xl pl-35 font-light mb-6">{currentStep.content}</p>
+
+                    <p className="text-sm sm:text-base md:text-lg lg:text-xl font-light mb-4 text-center sm:text-left">
+                        {t(currentStep.content)}
+                    </p>
+
                     <img
                         src={currentStep.image}
-                        className="mx-auto w-[75%] max-h-[320px] object-contain"
+                        alt="Step Illustration"
+                        className="
+      mx-auto
+      w-[80%] sm:w-[70%] md:w-[60%] lg:w-[50%] xl:w-[40%]
+      aspect-[5/3] max-h-[300px] sm:max-h-[340px] md:max-h-[380px] lg:max-h-[360px] xl:max-h-[360px]
+      object-contain mb-4
+    "
                     />
                 </div>
+
+
                 {/* Navigation */}
-                <div className="flex justify-end mt-6">
+                <div className="flex flex-col sm:flex-row justify-end items-center sm:items-end gap-3 sm:gap-4 mt-auto px-4 sm:px-6 md:px-10">
                     {StepIndex > 0 && (
                         <button
                             onClick={goPrev}
-                            className="px-4 py-2 cursor-pointer w-max text-lg font-semibold border-2 border-[rgb(58,166,202,var(--tw-text-opacity,1))] text-[rgb(58,166,202,var(--tw-text-opacity,1))] rounded-md hover:bg-[rgb(58,166,202,var(--tw-text-opacity,1))]/80 hover:text-white "
+                            className="w-full sm:w-auto px-4 py-2 text-sm sm:text-base font-semibold border-2 border-cyan-600 text-cyan-600 rounded-md hover:bg-cyan-600 hover:text-white transition"
                         >
-                            Previous
+                            {t('Previous')}
                         </button>
                     )}
                     <button
@@ -181,16 +191,17 @@ const Pop_up_Schedule: React.FC<PopUpProps> = ({ onClose }) => {
                                 goNext();
                             }
                         }}
-                        className={`px-4 py-2 ml-3 mr-10 ${isLastStep ? 'cursor-pointer rounded-md bg-[rgb(3,105,94,var(--tw-bg-opacity,1))] hover:bg-[rgb(3,105,94,var(--tw-bg-opacity,1))]/90' : 'cursor-pointer rounded-md bg-[rgb(3,105,94,var(--tw-bg-opacity,1))] hover:bg-[rgb(3,105,94,var(--tw-bg-opacity,1))]/90 border-2'
-                            } text-white text-lg font-semibold rounded transition duration-200`}
+                        className={`w-full sm:w-auto px-4 py-2 text-sm sm:text-base font-semibold text-white rounded-md transition duration-200 ${isLastStep
+                            ? 'bg-emerald-700 hover:bg-emerald-800'
+                            : 'bg-emerald-700 hover:bg-emerald-800'
+                            }`}
                     >
-                        {isLastStep ? 'Done' : 'Next'}
+                        {isLastStep ? t('Done') : t('Next')}
                     </button>
                 </div>
+
             </div>
         </div>
     );
-
 }
-
 export default Pop_up_Schedule

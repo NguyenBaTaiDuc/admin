@@ -2,7 +2,7 @@
 module.exports = {
   // ...
   plugins: [
-    require('tailwind-scrollbar'),
+    
   ],
 };
 
@@ -40,6 +40,12 @@ export default {
         "dashboard-green": "#03695E",
         "dashboard-violet": "#77279A",
       },
+    },
+    screens: {
+      xs: { max: '360px' },
+      sm: { min: '361px', max: '639px' },
+      base: { min: '640px', max: '1023px' },
+      lg: '1024px',
     },
     keyframes: {
       spin: {
@@ -79,6 +85,5 @@ export default {
     },
   },
   plugins: [
-    require('tailwind-scrollbar')
   ],
 };

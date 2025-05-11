@@ -23,7 +23,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ title, description , hove
       title={
         <div className="flex flex-col items-center text-center border p-3">
           <InfoCircleOutlined style={{ fontSize: 45, color: 'rgb(3,105,94,var(--tw-text-opacity,1))' }} />
-          <div className="font-semibold self-center mt-4 underline text-xl">{title}</div>
+          <div className="font-semibold self-center mt-4 underline text-md">{title}</div>
           <div className="text-xs text-gray-600 mt-3">{description}</div>
         </div>
       }

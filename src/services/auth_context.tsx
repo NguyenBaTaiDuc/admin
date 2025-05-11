@@ -16,10 +16,8 @@ export const AuthContext = createContext<AuthContextType>({
 
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-    const [isLogin, setIsLogin] = useState<boolean>(() => {
-      const token = localStorage.getItem('accessToken');
-      return !!token;
-    });
+    const [isLogin, setIsLogin] = useState<boolean>(() => !!localStorage.getItem('accessToken')
+  );
   
     const [accessToken, setAccessToken] = useState<string | null>(() => {
       return localStorage.getItem('accessToken');
@@ -35,6 +33,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       localStorage.removeItem('accessToken');
       setAccessToken(null);
       setIsLogin(false);
+      
     };
     useEffect(() => {
         const checkTokenValidity = async () => {

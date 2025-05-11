@@ -1,10 +1,10 @@
 // components/EditableTable.tsx
-import React, { use, useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import type { GetRef, InputRef, TableProps } from 'antd';
-import { Button, Form, Input, Popconfirm, Table } from 'antd';
-
+import { Form, Input, Table, Pagination } from 'antd';
+import '../index.css'
 type FormInstance<T> = GetRef<typeof Form<T>>;
-const EditableContext = React.createContext<FormInstance<any> | null>(null);
+const EditableContext = React.createContext<FormInstance<object> | null>(null);
 
 export interface FacebookPost {
   id: string;
@@ -21,7 +21,7 @@ interface DataType {
 
 type ColumnTypes = Exclude<TableProps<DataType>['columns'], undefined>;
 
-const EditableRow: React.FC<any> = ({ index, ...props }) => {
+const EditableRow: React.FC<React.HTMLAttributes<HTMLTableRowElement>> = ({...props }) => {
 
   const [form] = Form.useForm();
   return (
@@ -41,7 +41,7 @@ const EditableCell: React.FC<any> = ({
   record,
   handleSave,
   ...restProps
-}) => {
+ }) => {
   const [editing, setEditing] = useState(false);
   const inputRef = useRef<InputRef>(null);
   const form = useContext(EditableContext)!;
@@ -104,34 +104,12 @@ const EditableTable = ({ posts, onViewContent }: { posts: FacebookPost[], onView
       image: 'src/assets/iconFacebook.svg',
     }));
     console.log(formatted.length);
-    
+
     setDataSource(formatted);
   }, [posts]);
-  const [count, setCount] = useState(2);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5;
   console.log(currentPage);
-  
-  // const handleDelete = (key: React.Key) => {
-  //   const newData = dataSource.filter((item) => item.key !== key);
-  //   setDataSource(newData);
-  // };
-
-  // const handleAdd = () => {
-  //   const newData: DataType = {
-  //     key: count.toString(),
-  //     name: `Edward King ${count}`,
-  //     age: '32',
-  //     address: `London, Park Lane no. ${count}`,
-  //   };
-  //   const newList = [...dataSource, newData];
-  //   setDataSource(newList);
-  //   setCount(count + 1);
-
-  //   const newPage = Math.ceil(newList.length / pageSize);
-  //   setCurrentPage(newPage);
-  // };
-
   const handleSave = (row: DataType) => {
     const newData = [...dataSource];
     const index = newData.findIndex((item) => row.key === item.key);
@@ -211,24 +189,25 @@ const EditableTable = ({ posts, onViewContent }: { posts: FacebookPost[], onView
       }),
     };
   });
-
+  const paginatedData = dataSource.slice((currentPage - 1) * pageSize, currentPage * pageSize);
   return (
     <div>
-      {/* <Button onClick={handleAdd} type="primary" style={{ marginBottom: 16 }}>
-        Add a row
-      </Button> */}
       <Table
-        pagination={{
-          pageSize,
-          current: currentPage,
-          onChange: (page) => setCurrentPage(page),
-        }}
+        pagination={false}
         bordered
         components={components}
-        dataSource={dataSource}
+        dataSource={paginatedData}
         columns={columns as ColumnTypes}
         rowClassName={() => 'editable-row'}
       />
+      <div className="flex justify-center mt-4">
+        <Pagination
+          current={currentPage}
+          pageSize={pageSize}
+          total={dataSource.length}
+          onChange={(page) => setCurrentPage(page)}
+        />
+      </div>
     </div>
   );
 };

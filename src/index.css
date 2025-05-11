@@ -112,4 +112,22 @@ body {
   font-size: 13px;
 }
 
+@media (max-width: 640px) {
+  .btn-mobile {
+    background-color: rgb(3,105,94);
+    color: white;
+  }
+
+  .btn-mobile svg {
+    color: white;
+    fill: white;
+  }
+  /* styles.css hoặc global CSS */
+.custom-pagination {
+  display: flex !important;
+  justify-content: center !important;
+  margin-top: 16px; /* khoảng cách với bảng */
+}
+
+}
 
