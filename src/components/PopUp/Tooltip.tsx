@@ -2,9 +2,7 @@
 import React, { useState } from 'react';
 import { Tooltip } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
-import '../PopUp/Tooltip.css'
 import { TooltipPlacement } from 'antd/es/tooltip';
-
 interface CustomTooltipProps {
   title: string;
   description: string;
@@ -14,7 +12,6 @@ interface CustomTooltipProps {
   className?: string;
   defaultColor?: string;
 }
-
 const CustomTooltip: React.FC<CustomTooltipProps> = ({ title, description , hoverColor, placement = 'top',
     customStyle = {}, className, defaultColor }) => {
   const [hovered, setHovered] = useState(false);

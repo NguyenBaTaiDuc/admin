@@ -9,6 +9,7 @@ body {
 .bg-custom-sidebar {
     background-image: linear-gradient(to bottom left, #FDCE1C 2%, #FE881C 10%, #FE881C 80%, #FDCE1C 100%);
   }
+  
 /* màu chủ đạo */
 :root {
   --color-primary: #FF760E;
@@ -111,6 +112,20 @@ body {
   max-width: 260px;
   font-size: 13px;
 }
+/* Tooltip.css */
+.ant-tooltip .ant-tooltip-inner {
+    background-color: white !important;
+    color: #333;
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    font-size: 13px;
+  }
+  /* 🎯 Màu mũi tên */
+.ant-tooltip .ant-tooltip-arrow::before {
+    background-color: white !important;
+  }
+  
 
 @media (max-width: 640px) {
   .btn-mobile {
