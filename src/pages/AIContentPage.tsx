@@ -9,7 +9,7 @@ const AIContentPage: React.FC = () => {
   return (
     <div className="flex flex-col px-8 justify-center bg-white items-center w-full sm:w-auto min-h-screen sm:min-h-[calc(100vh-35px)] rounded-none sm:rounded-xl shadow-none sm:shadow-xl">
 
-      <h1 className="font-bold py-2 text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl color-primary font-montserrat text-center sm:text-base pb-6 ">
+      <h1 className="font-bold py-2 text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl color-primary font-montserrat text-center  pb-6 ">
         {t("How Do You Want AI to Create Your Content?")}
       </h1>
 
