@@ -9,7 +9,6 @@ import RightOutlined from "@ant-design/icons/lib/icons/RightOutlined";
 import MergeOutlined from "@ant-design/icons/lib/icons/MergeOutlined";
 import HomeOutlined from "@ant-design/icons/lib/icons/HomeOutlined";
 import SettingOutlined from "@ant-design/icons/lib/icons/SettingOutlined";
-import './side_bar.css';
 import UnorderedListOutlined from "@ant-design/icons/lib/icons/UnorderedListOutlined";
 import CloseOutlined from "@ant-design/icons/lib/icons/CloseOutlined";
 import { useTranslation } from "react-i18next";
